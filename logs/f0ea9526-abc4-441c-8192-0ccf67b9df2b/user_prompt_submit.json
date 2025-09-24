@@ -38,5 +38,13 @@
     "permission_mode": "default",
     "hook_event_name": "UserPromptSubmit",
     "prompt": "proceed"
+  },
+  {
+    "session_id": "f0ea9526-abc4-441c-8192-0ccf67b9df2b",
+    "transcript_path": "/home/bryan/.claude/projects/-mnt-l-source-repos-mcp-ollama/f0ea9526-abc4-441c-8192-0ccf67b9df2b.jsonl",
+    "cwd": "/mnt/l/source-repos/mcp-ollama",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "/archived:versioned:get-up-to-speed-export "
   }
 ]
