@@ -1,4 +1,4 @@
-# Ollama MCP Server for Claude Desktop Commander
+# Ollama MCP Server for Claude Desktop
 
 A comprehensive Model Context Protocol (MCP) server that provides seamless integration between Ollama and Claude Desktop, enabling powerful local LLM interactions with superior tooling and user experience.
 
