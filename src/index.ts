@@ -63,7 +63,7 @@ class OllamaServer {
       tools: [
         {
           name: 'serve',
-          description: '✅ 95% Success Rate - Local Ollama server startup. 🚀 5-15s Startup (system-dependent). 🔗 Tier SYSTEM infrastructure management. Usually handled by Windows service.',
+          description: 'Start Ollama server. Usually runs automatically on Windows. Default port: 11434.',
           inputSchema: {
             type: 'object',
             properties: {},
@@ -72,17 +72,17 @@ class OllamaServer {
         },
         {
           name: 'create',
-          description: '✅ 90% Success Rate - Custom model creation from Modelfile. 🚀 1-30min (complexity-dependent). 🔗 Tier ADVANCED for custom model development. Use for project-specific fine-tuning.',
+          description: 'Create custom model from Modelfile. Define system prompts and parameters. Format: FROM base_model\\nSYSTEM "prompt"',
           inputSchema: {
             type: 'object',
             properties: {
               name: {
                 type: 'string',
-                description: 'Name for the custom model (e.g., custom-assistant)',
+                description: 'Name for your custom model (e.g., "my-assistant")',
               },
               modelfile: {
                 type: 'string',
-                description: 'Path to Modelfile with system prompt and configuration',
+                description: 'Path to Modelfile OR inline content like: FROM llama3.2:1b\\nSYSTEM "You are helpful"',
               },
             },
             required: ['name', 'modelfile'],
@@ -91,13 +91,13 @@ class OllamaServer {
         },
         {
           name: 'show',
-          description: '✅ 100% Success Rate - Detailed model metadata API. 🚀 <3s Response Time (JSON specifications). 🔗 Tier HIGH integration for model capability discovery. Workflow: ollama_list() → ollama_show() → optimize parameters for ollama_run()/ollama_chat_completion(). Returns: context length, parameter count, quantization, architecture details, performance characteristics.',
+          description: 'Get detailed model information including context window size, parameters, and architecture. Use after list to understand model capabilities.',
           inputSchema: {
             type: 'object',
             properties: {
               name: {
                 type: 'string',
-                description: 'Name of the model (get from ollama_list output)',
+                description: 'Model name from list command (e.g., "llama3.2:1b", "qwen2.5-coder:7b-instruct")',
               },
             },
             required: ['name'],
@@ -106,22 +106,37 @@ class OllamaServer {
         },
         {
           name: 'run',
-          description: '✅ 100% Success Rate - Direct Windows Ollama API integration. 🚀 2-8s Response Time (model-dependent). 🔗 Tier HIGH integration with manus_code_interpreter workflows. Primary alternative to external API calls for privacy-sensitive code generation. Workflow: ollama_list() → ollama_show() → ollama_run() → manus_code_interpreter(). Model selection: llama3.2:1b (2-3s, quick tasks), qwen2.5-coder:7b-instruct (5-8s, code generation), smallthinker:latest (4-6s, analysis).',
+          description: 'Execute a single prompt with a model. Best for one-shot tasks. Use llama3.2:1b for speed (2-3s), qwen2.5-coder for code (5-8s).',
           inputSchema: {
             type: 'object',
             properties: {
               name: {
                 type: 'string',
-                description: 'Name of the model (check ollama_list() for available models)',
+                description: 'Model name (e.g., "llama3.2:1b" for speed, "qwen2.5-coder:7b-instruct" for code)',
               },
               prompt: {
                 type: 'string',
-                description: 'Prompt to send to the model (optimize for model type)',
+                description: 'The prompt text to send to the model',
               },
               timeout: {
                 type: 'number',
                 description: 'Timeout in milliseconds (default: 60000, increase for complex prompts)',
                 minimum: 1000,
+                maximum: 300000,
+              },
+              temperature: {
+                type: 'number',
+                description: 'Creativity level: 0.1-0.3 for code/facts, 0.7-1.0 for creative writing',
+                minimum: 0,
+                maximum: 2,
+              },
+              seed: {
+                type: 'number',
+                description: 'Random seed for reproducible outputs',
+              },
+              system: {
+                type: 'string',
+                description: 'Optional system prompt to set behavior (overrides model default)',
               },
             },
             required: ['name', 'prompt'],
@@ -130,13 +145,13 @@ class OllamaServer {
         },
         {
           name: 'pull',
-          description: '✅ 95% Success Rate - Registry download with retry logic. 🚀 30s-10m (size-dependent). 🔗 Tier MEDIUM integration for one-time model setup. Use for: qwen2.5-coder:7b-instruct (specialized coding), llama3.2:1b (fast general).',
+          description: 'Download model from registry. Popular: llama3.2:1b (1GB, fast), qwen2.5-coder:7b-instruct (5GB, code), mistral:7b (4GB).',
           inputSchema: {
             type: 'object',
             properties: {
               name: {
                 type: 'string',
-                description: 'Name of the model to pull (e.g., qwen2.5-coder:7b-instruct)',
+                description: 'Model to download (e.g., "llama3.2:1b" for 1GB fast model, "qwen2.5-coder:7b-instruct" for code)',
               },
             },
             required: ['name'],
@@ -145,13 +160,13 @@ class OllamaServer {
         },
         {
           name: 'push',
-          description: '✅ 85% Success Rate - Model registry publication. 🚀 5-60min (network-dependent). 🔗 Tier ADVANCED for model sharing workflow. Use for publishing custom models.',
+          description: 'Upload model to Ollama registry. Requires account and authentication. Name format: username/modelname:tag',
           inputSchema: {
             type: 'object',
             properties: {
               name: {
                 type: 'string',
-                description: 'Name of the model to push (requires registry access)',
+                description: 'Model name with namespace (e.g., "username/my-model:latest")',
               },
             },
             required: ['name'],
@@ -160,7 +175,7 @@ class OllamaServer {
         },
         {
           name: 'list',
-          description: '✅ 100% Success Rate - HTTP API model discovery. 🚀 <2s Response Time (cached metadata). 🔗 Tier HIGH integration, foundation for all workflows. Primary alternative to manual model management. Workflow: Start with ollama_list() → ollama_show() → ollama_run()/ollama_chat_completion(). Returns: model name, digest (12 chars), size (GB), modified date. Direct Windows host access via host.docker.internal:11434.',
+          description: 'List all locally available Ollama models. Returns name, size, and last modified date. Start here to see what models you have.',
           inputSchema: {
             type: 'object',
             properties: {},
@@ -169,17 +184,17 @@ class OllamaServer {
         },
         {
           name: 'cp',
-          description: '✅ 100% Success Rate - Model versioning and backup. 🚀 <10s Response Time (metadata-only). 🔗 Tier LOW for version control workflow. Use for model backup before customization.',
+          description: 'Copy a model with a new name. Useful for creating backups before modifications or versioning custom models.',
           inputSchema: {
             type: 'object',
             properties: {
               source: {
                 type: 'string',
-                description: 'Source model name (existing model to copy)',
+                description: 'Existing model name to copy',
               },
               destination: {
                 type: 'string',
-                description: 'Destination model name (new model name for backup)',
+                description: 'New name for the copy (e.g., "my-model-backup")',
               },
             },
             required: ['source', 'destination'],
@@ -188,13 +203,13 @@ class OllamaServer {
         },
         {
           name: 'rm',
-          description: '✅ 100% Success Rate - Local model deletion for storage cleanup. 🚀 <5s Response Time (immediate). 🔗 Tier LOW storage management utility. Use with ollama_list() to identify unused models.',
+          description: 'Delete a local model to free disk space. Permanent action - model must be re-downloaded to use again.',
           inputSchema: {
             type: 'object',
             properties: {
               name: {
                 type: 'string',
-                description: 'Name of the model to remove (check ollama_list first)',
+                description: 'Model name to remove (check with list first)',
               },
             },
             required: ['name'],
@@ -203,13 +218,13 @@ class OllamaServer {
         },
         {
           name: 'chat_completion',
-          description: '✅ 100% Success Rate - OpenAI-compatible conversation API. 🚀 3-10s Response Time (context-dependent). 🔗 Tier HIGH integration for multi-turn conversation workflows. Primary alternative to OpenAI GPT API for privacy-sensitive conversations. Workflow: ollama_list() → ollama_show() → ollama_chat_completion() → manus_code_interpreter(). Temperature guide: 0.1-0.3 for code, 0.7-1.0 for creative tasks.',
+          description: 'Multi-turn conversation with context. Use for iterative tasks. Temperature: 0.1-0.3 for code, 0.7-1.0 for creative.',
           inputSchema: {
             type: 'object',
             properties: {
               model: {
                 type: 'string',
-                description: 'Name of the Ollama model to use (check context length with ollama_show)',
+                description: 'Model name (verify context length with show first)',
               },
               messages: {
                 type: 'array',
@@ -226,18 +241,32 @@ class OllamaServer {
                   },
                   required: ['role', 'content'],
                 },
-                description: 'Array of messages in conversation (system → user → assistant pattern)',
+                description: 'Conversation history: [{role: "system"|"user"|"assistant", content: "text"}]',
               },
               temperature: {
                 type: 'number',
-                description: 'Sampling temperature: 0.1-0.3 for code, 0.7-1.0 for creative tasks',
+                description: 'Creativity level: 0.1-0.3 for code/facts, 0.7-1.0 for creative writing',
                 minimum: 0,
                 maximum: 2,
               },
               timeout: {
                 type: 'number',
-                description: 'Timeout in milliseconds (default: 60000, increase for complex conversations)',
+                description: 'Timeout in milliseconds (default: 60000)',
                 minimum: 1000,
+                maximum: 300000,
+              },
+              max_tokens: {
+                type: 'number',
+                description: 'Maximum tokens to generate in response',
+                minimum: 1,
+                maximum: 100000,
+              },
+              stop: {
+                type: 'array',
+                items: {
+                  type: 'string',
+                },
+                description: 'Stop sequences to end generation',
               },
             },
             required: ['model', 'messages'],

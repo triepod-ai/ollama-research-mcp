@@ -4,6 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Recent Updates (2025-09-24)
 
+### Tool Optimization & Enhancement
+- **Optimized Tool Descriptions**: Simplified, clear descriptions without emoji clutter for better discoverability
+- **Enhanced Parameters**: Added missing parameters (temperature, seed, system, max_tokens, stop) to core tools
+- **Workflow Integration**: Defined clear tool chaining patterns (list → show → run/chat_completion)
+- **Model Recommendations**: Specific model guidance (llama3.2:1b for speed, qwen2.5-coder for code)
+- **Improved Error Handling**: Better parameter validation and descriptive error messages
+
+### SDK & Infrastructure
 - **MCP SDK Upgrade**: Successfully upgraded from v0.6.0 to v1.18.1
 - **TypeScript Update**: Updated to TypeScript 5.9.2
 - **Compatibility**: Server maintains backward compatibility with existing Claude Desktop configurations
@@ -45,9 +53,10 @@ This project implements a Model Context Protocol (MCP) server that bridges Claud
 
 **1. Tool Registration Pattern:**
 All tools are registered in `setupToolHandlers()` with:
-- Structured input schemas using JSON Schema
-- Success rates and performance metrics in descriptions
-- Tier classifications (HIGH, MEDIUM, LOW, SYSTEM, ADVANCED)
+- Clear, action-oriented descriptions without emoji clutter
+- Enhanced parameter schemas with usage guidance
+- Workflow chaining recommendations (list → show → run/chat_completion)
+- Model-specific recommendations and performance characteristics
 
 **2. API vs CLI Integration:**
 - Performance-critical operations (list, show, run, chat_completion) use direct HTTP API
@@ -70,12 +79,14 @@ Add to Claude Desktop configuration (`%APPDATA%\Claude\claude_desktop_config.jso
       "command": "node",
       "args": ["L:/source-repos/mcp-ollama/build/index.js"],
       "env": {
-        "OLLAMA_HOST": "http://127.0.0.1:11434"
+        "OLLAMA_HOST": "http://host.docker.internal:11434"
       }
     }
   }
 }
 ```
+
+**Note**: For WSL/Docker environments, use `http://host.docker.internal:11434` or your host machine's IP (e.g., `http://10.0.0.225:11434`) instead of `localhost`.
 
 ## Common Workflows
 
