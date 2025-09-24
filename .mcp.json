@@ -46,6 +46,16 @@
         "-u",
         "/home/bryan/mcp-servers/manus-mcp/mcp_server.py"
       ]
+    },
+    "ollama": {
+      "command": "node",
+      "args": [
+        "/mnt/l/source-repos/mcp-ollama/build/index.js"
+      ],
+      "cwd": "/mnt/l/source-repos/mcp-ollama",
+      "env": {
+        "OLLAMA_HOST": "http://host.docker.internal:11434"
+      }
     }
   }
 }

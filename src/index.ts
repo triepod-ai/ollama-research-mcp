@@ -63,7 +63,7 @@ class OllamaServer {
       tools: [
         {
           name: 'serve',
-          description: 'Start Ollama server. Usually runs automatically on Windows. Default port: 11434.',
+          description: 'Start Ollama server (usually auto-starts on Windows). Default port: 11434. Run if getting connection errors. Check with "list" after starting. For WSL/Docker: May need special host configuration.',
           inputSchema: {
             type: 'object',
             properties: {},
@@ -72,7 +72,7 @@ class OllamaServer {
         },
         {
           name: 'create',
-          description: 'Create custom model from Modelfile. Define system prompts and parameters. Format: FROM base_model\\nSYSTEM "prompt"',
+          description: 'Create custom model from Modelfile. Define system prompts and parameters. Format: FROM base_model\\nSYSTEM "custom instructions"\\nPARAMETER temperature 0.7. Use for: Specialized behaviors, preset configurations, fine-tuned responses.',
           inputSchema: {
             type: 'object',
             properties: {
@@ -82,7 +82,7 @@ class OllamaServer {
               },
               modelfile: {
                 type: 'string',
-                description: 'Path to Modelfile OR inline content like: FROM llama3.2:1b\\nSYSTEM "You are helpful"',
+                description: 'Path to Modelfile OR inline content like: FROM llama3.2:1b\\nSYSTEM "You are helpful"\\nPARAMETER temperature 0.7',
               },
             },
             required: ['name', 'modelfile'],
@@ -91,13 +91,13 @@ class OllamaServer {
         },
         {
           name: 'show',
-          description: 'Get detailed model information including context window size, parameters, and architecture. Use after list to understand model capabilities.',
+          description: 'Get detailed specifications for any model including context window size, parameter count, quantization method, and template format. Essential for understanding model capabilities and limitations before use. Check context length for prompt size limits and template format for compatibility.',
           inputSchema: {
             type: 'object',
             properties: {
               name: {
                 type: 'string',
-                description: 'Model name from list command (e.g., "llama3.2:1b", "qwen2.5-coder:7b-instruct")',
+                description: 'Model name from list command',
               },
             },
             required: ['name'],
@@ -106,37 +106,50 @@ class OllamaServer {
         },
         {
           name: 'run',
-          description: 'Execute a single prompt with a model. Best for one-shot tasks. Use llama3.2:1b for speed (2-3s), qwen2.5-coder for code (5-8s).',
+          description: 'Execute a single prompt and get plain text response. Ideal for one-off queries, code generation, and analysis tasks. Returns clean output without JSON wrapping or template artifacts. Faster than chat_completion for single requests.',
           inputSchema: {
             type: 'object',
             properties: {
               name: {
                 type: 'string',
-                description: 'Model name (e.g., "llama3.2:1b" for speed, "qwen2.5-coder:7b-instruct" for code)',
+                description: 'Model name to use (from list command)',
               },
               prompt: {
                 type: 'string',
-                description: 'The prompt text to send to the model',
+                description: 'Your prompt text (single request, not conversation)',
               },
               timeout: {
                 type: 'number',
-                description: 'Timeout in milliseconds (default: 60000, increase for complex prompts)',
+                description: 'Timeout in milliseconds. Scale with model size: smaller models (30-60s), medium (60-120s), large (120-300s)',
                 minimum: 1000,
                 maximum: 300000,
               },
               temperature: {
                 type: 'number',
-                description: 'Creativity level: 0.1-0.3 for code/facts, 0.7-1.0 for creative writing',
+                description: 'Controls randomness: 0.1-0.3 for factual/code, 0.5-0.7 for balanced, 1.0+ for creative content',
                 minimum: 0,
                 maximum: 2,
               },
               seed: {
                 type: 'number',
-                description: 'Random seed for reproducible outputs',
+                description: 'Random seed for reproducible outputs (use same seed for identical results)',
               },
               system: {
                 type: 'string',
-                description: 'Optional system prompt to set behavior (overrides model default)',
+                description: 'Optional behavior instruction (e.g., "You are a Python expert")',
+              },
+              max_tokens: {
+                type: 'number',
+                description: 'Maximum tokens to generate. Estimate ~1.3 tokens per word. Brief: 50-200, Detailed: 500-1500, Comprehensive: 2000+',
+                minimum: 1,
+                maximum: 100000,
+              },
+              stop: {
+                type: 'array',
+                items: {
+                  type: 'string',
+                },
+                description: 'Stop sequences to end generation (e.g., ["\\n", "END"])',
               },
             },
             required: ['name', 'prompt'],
@@ -145,13 +158,13 @@ class OllamaServer {
         },
         {
           name: 'pull',
-          description: 'Download model from registry. Popular: llama3.2:1b (1GB, fast), qwen2.5-coder:7b-instruct (5GB, code), mistral:7b (4GB).',
+          description: 'Download models from Ollama registry. Model sizes vary from <1GB to 100GB+. Smaller models (1-7B params) are faster, larger models (30B+ params) offer better quality. Check available disk space before downloading.',
           inputSchema: {
             type: 'object',
             properties: {
               name: {
                 type: 'string',
-                description: 'Model to download (e.g., "llama3.2:1b" for 1GB fast model, "qwen2.5-coder:7b-instruct" for code)',
+                description: 'Model name to download from registry. Format: modelname:tag',
               },
             },
             required: ['name'],
@@ -175,7 +188,7 @@ class OllamaServer {
         },
         {
           name: 'list',
-          description: 'List all locally available Ollama models. Returns name, size, and last modified date. Start here to see what models you have.',
+          description: 'List all locally available models with their specifications. Shows model names, sizes, modification dates, and quantization formats. Use this to discover what models are installed before running queries. Start here to see available options.',
           inputSchema: {
             type: 'object',
             properties: {},
@@ -218,13 +231,13 @@ class OllamaServer {
         },
         {
           name: 'chat_completion',
-          description: 'Multi-turn conversation with context. Use for iterative tasks. Temperature: 0.1-0.3 for code, 0.7-1.0 for creative.',
+          description: 'Conduct multi-turn conversations with context retention. Maintains conversation history across messages. Returns structured JSON response. Note: Some models may include template tokens in output - verify with "show" command for template compatibility.',
           inputSchema: {
             type: 'object',
             properties: {
               model: {
                 type: 'string',
-                description: 'Model name (verify context length with show first)',
+                description: 'Model name to use. Check template compatibility with "show" if output contains artifacts.',
               },
               messages: {
                 type: 'array',
@@ -241,23 +254,23 @@ class OllamaServer {
                   },
                   required: ['role', 'content'],
                 },
-                description: 'Conversation history: [{role: "system"|"user"|"assistant", content: "text"}]',
+                description: 'Conversation history array with role and content for each message.',
               },
               temperature: {
                 type: 'number',
-                description: 'Creativity level: 0.1-0.3 for code/facts, 0.7-1.0 for creative writing',
+                description: 'Controls randomness: 0.1-0.3 for consistency, 0.5-0.7 for balanced, 1.0+ for creativity',
                 minimum: 0,
                 maximum: 2,
               },
               timeout: {
                 type: 'number',
-                description: 'Timeout in milliseconds (default: 60000)',
+                description: 'Timeout in milliseconds. Scale with model size and conversation length.',
                 minimum: 1000,
                 maximum: 300000,
               },
               max_tokens: {
                 type: 'number',
-                description: 'Maximum tokens to generate in response',
+                description: 'Maximum response length. Consider cumulative context when setting limits.',
                 minimum: 1,
                 maximum: 100000,
               },
@@ -266,7 +279,7 @@ class OllamaServer {
                 items: {
                   type: 'string',
                 },
-                description: 'Stop sequences to end generation',
+                description: 'Stop sequences to end generation (e.g., ["\\n", "User:"])',
               },
             },
             required: ['model', 'messages'],
@@ -375,13 +388,22 @@ class OllamaServer {
   private async handleRun(args: any) {
     try {
       // Use non-streaming mode for simplicity and compatibility
+      const requestBody: any = {
+        model: args.name,
+        prompt: args.prompt,
+        stream: false,
+      };
+
+      // Add optional parameters if provided
+      if (args.temperature !== undefined) requestBody.temperature = args.temperature;
+      if (args.seed !== undefined) requestBody.seed = args.seed;
+      if (args.system !== undefined) requestBody.system = args.system;
+      if (args.max_tokens !== undefined) requestBody.max_tokens = args.max_tokens;
+      if (args.stop !== undefined) requestBody.stop = args.stop;
+
       const response = await axios.post(
         `${OLLAMA_HOST}/api/generate`,
-        {
-          model: args.name,
-          prompt: args.prompt,
-          stream: false,
-        },
+        requestBody,
         {
           timeout: args.timeout || DEFAULT_TIMEOUT,
         }
@@ -519,16 +541,29 @@ class OllamaServer {
         })
         .join('');
 
+      // Build request options with all supported parameters
+      const requestOptions: any = {
+        model: args.model,
+        prompt,
+        stream: false,
+        raw: true, // Add raw mode for more direct responses
+      };
+
+      // Add optional parameters if provided
+      if (args.temperature !== undefined) {
+        requestOptions.temperature = args.temperature;
+      }
+      if (args.max_tokens !== undefined) {
+        requestOptions.num_predict = args.max_tokens; // Ollama uses num_predict for max tokens
+      }
+      if (args.stop !== undefined) {
+        requestOptions.stop = Array.isArray(args.stop) ? args.stop : [args.stop];
+      }
+
       // Make request to Ollama API with configurable timeout and raw mode
       const response = await axios.post<OllamaGenerateResponse>(
         `${OLLAMA_HOST}/api/generate`,
-        {
-          model: args.model,
-          prompt,
-          stream: false,
-          temperature: args.temperature,
-          raw: true, // Add raw mode for more direct responses
-        },
+        requestOptions,
         {
           timeout: args.timeout || DEFAULT_TIMEOUT,
         }
