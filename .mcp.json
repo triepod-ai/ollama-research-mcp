@@ -1,0 +1,51 @@
+{
+  "mcpServers": {
+    "chroma": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "-e",
+        "PYTHONUNBUFFERED=1",
+        "-e",
+        "TQDM_DISABLE=1",
+        "-e",
+        "CHROMA_CLIENT_TYPE=http",
+        "-e",
+        "CHROMA_HOST=chroma-chroma",
+        "-e",
+        "CHROMA_PORT=8000",
+        "-e",
+        "CHROMA_SSL=false",
+        "-e",
+        "ANONYMIZED_TELEMETRY=false",
+        "-e",
+        "CHROMA_TELEMETRY_DISABLED=true",
+        "chroma-mcp",
+        "python",
+        "-u",
+        "-m",
+        "chroma_mcp.server",
+        "--client-type",
+        "http",
+        "--host",
+        "chroma-chroma",
+        "--port",
+        "8000",
+        "--ssl",
+        "false"
+      ]
+    },
+    "qdrant": {
+      "command": "/home/bryan/run-qdrant-docker-mcp.sh",
+      "args": []
+    },
+    "manus": {
+      "command": "/home/bryan/mcp-servers/manus-mcp/.venv/bin/python",
+      "args": [
+        "-u",
+        "/home/bryan/mcp-servers/manus-mcp/mcp_server.py"
+      ]
+    }
+  }
+}

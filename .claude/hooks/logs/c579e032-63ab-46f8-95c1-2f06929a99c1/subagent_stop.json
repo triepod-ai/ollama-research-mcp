@@ -1,0 +1,9 @@
+[
+  {
+    "session_id": "c579e032-63ab-46f8-95c1-2f06929a99c1",
+    "transcript_path": "/home/bryan/.claude/projects/-home-bryan-multi-agent-observability-system/c579e032-63ab-46f8-95c1-2f06929a99c1.jsonl",
+    "cwd": "/home/bryan/multi-agent-observability-system/.claude/hooks",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false
+  }
+]

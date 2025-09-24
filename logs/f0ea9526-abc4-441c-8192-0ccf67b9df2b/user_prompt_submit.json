@@ -1,0 +1,42 @@
+[
+  {
+    "session_id": "f0ea9526-abc4-441c-8192-0ccf67b9df2b",
+    "transcript_path": "/home/bryan/.claude/projects/-mnt-l-source-repos-mcp-ollama/f0ea9526-abc4-441c-8192-0ccf67b9df2b.jsonl",
+    "cwd": "/mnt/l/source-repos/mcp-ollama",
+    "permission_mode": "default",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "based on the newest mcp standard june 2025, what are some updates we can make to this mcp server? @agent-general-purpose "
+  },
+  {
+    "session_id": "f0ea9526-abc4-441c-8192-0ccf67b9df2b",
+    "transcript_path": "/home/bryan/.claude/projects/-mnt-l-source-repos-mcp-ollama/f0ea9526-abc4-441c-8192-0ccf67b9df2b.jsonl",
+    "cwd": "/mnt/l/source-repos/mcp-ollama",
+    "permission_mode": "default",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "@agent-orchestrate-agents-adv flesh out the plan"
+  },
+  {
+    "session_id": "f0ea9526-abc4-441c-8192-0ccf67b9df2b",
+    "transcript_path": "/home/bryan/.claude/projects/-mnt-l-source-repos-mcp-ollama/f0ea9526-abc4-441c-8192-0ccf67b9df2b.jsonl",
+    "cwd": "/mnt/l/source-repos/mcp-ollama",
+    "permission_mode": "default",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "take the upgrade plan and stripe out the over engineering - this is a local tool"
+  },
+  {
+    "session_id": "f0ea9526-abc4-441c-8192-0ccf67b9df2b",
+    "transcript_path": "/home/bryan/.claude/projects/-mnt-l-source-repos-mcp-ollama/f0ea9526-abc4-441c-8192-0ccf67b9df2b.jsonl",
+    "cwd": "/mnt/l/source-repos/mcp-ollama",
+    "permission_mode": "default",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "@agent-cmd-agent-select-logic assign agents for these tasks"
+  },
+  {
+    "session_id": "f0ea9526-abc4-441c-8192-0ccf67b9df2b",
+    "transcript_path": "/home/bryan/.claude/projects/-mnt-l-source-repos-mcp-ollama/f0ea9526-abc4-441c-8192-0ccf67b9df2b.jsonl",
+    "cwd": "/mnt/l/source-repos/mcp-ollama",
+    "permission_mode": "default",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "proceed"
+  }
+]

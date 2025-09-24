@@ -1,0 +1,19 @@
+[
+  {
+    "session_id": "00ceb4a1-c5dd-4b79-827d-33f53829fc72",
+    "transcript_path": "/home/bryan/.claude/projects/-home-bryan-bin-speak-app/00ceb4a1-c5dd-4b79-827d-33f53829fc72.jsonl",
+    "cwd": "/home/bryan/multi-agent-observability-system/.claude/hooks/utils/tts",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "cd /home/bryan/multi-agent-observability-system/.claude/hooks/utils/tts && python3 -m py_compile adaptive_cleanup.py lazy_loader.py config_manager.py connection_pool.py openai_tts_optimized.py performance_monitor.py",
+      "description": "Test syntax of all synchronized files"
+    },
+    "tool_response": {
+      "stdout": "",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    }
+  }
+]

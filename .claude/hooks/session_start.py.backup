@@ -1,0 +1,261 @@
+#!/usr/bin/env python3
+"""
+SessionStart Hook - Multi-Agent Observability System
+
+Handles Claude Code session initialization events with intelligent context loading,
+personalized TTS notifications, and observability integration.
+
+Features:
+- Project context loading (status, recent changes, active issues)
+- Personalized welcome messages with TTS
+- Session initialization tracking and observability
+- Support for all session start types (startup, resume, clear)
+- Agent monitoring bootstrap
+"""
+
+import sys
+import json
+import os
+import subprocess
+from pathlib import Path
+from datetime import datetime
+from typing import Dict, Any, Optional, List
+
+# Add utils to path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'utils'))
+
+from constants import ensure_session_log_dir
+from http_client import send_event_to_server
+from tts.coordinated_speak import notify_tts_coordinated
+
+
+def get_project_context() -> Dict[str, Any]:
+    """Load project context including status, recent changes, and active work."""
+    # Dynamically determine project name from current working directory
+    current_dir = Path.cwd()
+    project_name = current_dir.name
+    
+    context = {
+        "project_status": None,
+        "recent_changes": [],
+        "git_status": None,
+        "active_issues": [],
+        "project_name": project_name,
+        "working_directory": str(current_dir)
+    }
+    
+    try:
+        # Load project status
+        status_file = Path("PROJECT_STATUS.md")
+        if status_file.exists():
+            context["project_status"] = status_file.read_text()[:500] + "..." if len(status_file.read_text()) > 500 else status_file.read_text()
+        
+        # Get recent git changes
+        try:
+            git_log = subprocess.run(
+                ["git", "log", "--oneline", "-5"],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            if git_log.returncode == 0:
+                context["recent_changes"] = git_log.stdout.strip().split('\n')
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            pass
+        
+        # Get git status
+        try:
+            git_status = subprocess.run(
+                ["git", "status", "--porcelain"],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            if git_status.returncode == 0:
+                context["git_status"] = git_status.stdout.strip()
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            pass
+            
+    except Exception as e:
+        print(f"Warning: Error loading project context: {e}", file=sys.stderr)
+    
+    return context
+
+
+def should_send_tts_notification(source: str, context: Dict[str, Any]) -> bool:
+    """Determine if a TTS notification should be sent based on session context."""
+    
+    # Always notify for new/clear sessions (these indicate actual agent work starting)
+    if source in ["startup", "clear"]:
+        return True
+    
+    # For resume sessions, only notify if there's meaningful context
+    if source == "resume":
+        # Check for active work indicators
+        modified_files = 0
+        if context.get("git_status"):
+            modified_files = len([line for line in context["git_status"].split('\n') if line.strip()])
+        
+        recent_commits = len(context.get("recent_changes", []))
+        has_project_status = bool(context.get("project_status"))
+        
+        # Notify if there's active work or significant project context
+        if modified_files > 5 or recent_commits > 0 or has_project_status:
+            return True
+        
+        # Skip notification for simple resume with no context
+        return False
+    
+    # Default: don't notify for unknown session types
+    return False
+
+
+def format_welcome_message(source: str, context: Dict[str, Any]) -> str:
+    """Format personalized welcome message based on session start type and context."""
+    project_name = context.get("project_name", "project")
+    
+    # Base message by source type - more agent-focused
+    if source == "startup":
+        base_msg = f"AI agent ready for {project_name}"
+    elif source == "resume":
+        base_msg = f"Continuing work on {project_name}"
+    elif source == "clear":
+        base_msg = f"Fresh session starting for {project_name}"
+    else:
+        base_msg = f"Agent active on {project_name}"
+    
+    # Add context hints for meaningful sessions
+    context_hints = []
+    
+    if context.get("git_status"):
+        modified_files = len([line for line in context["git_status"].split('\n') if line.strip()])
+        if modified_files > 0:
+            context_hints.append(f"{modified_files} modified files")
+    
+    if context.get("recent_changes"):
+        recent_count = len(context["recent_changes"])
+        if recent_count > 0:
+            context_hints.append(f"{recent_count} recent commits")
+    
+    if context_hints:
+        return f"{base_msg} - {', '.join(context_hints[:2])}"
+    
+    return base_msg
+
+
+def generate_context_injection(context: Dict[str, Any]) -> str:
+    """Generate context to inject into Claude's session."""
+    parts = []
+    
+    # Project overview
+    project_name = context.get("project_name", "Unknown Project")
+    parts.append(f"# {project_name} - Session Context")
+    parts.append("")
+    
+    # Recent activity
+    if context.get("recent_changes"):
+        parts.append("## Recent Changes")
+        for change in context["recent_changes"][:3]:
+            parts.append(f"- {change}")
+        parts.append("")
+    
+    # Current status
+    if context.get("git_status"):
+        modified_files = [line[3:] for line in context["git_status"].split('\n') if line.strip()]
+        if modified_files:
+            parts.append("## Modified Files")
+            for file in modified_files[:5]:
+                parts.append(f"- {file}")
+            parts.append("")
+    
+    # Project status summary
+    if context.get("project_status"):
+        parts.append("## Current Project Status")
+        parts.append(context["project_status"][:300] + "..." if len(context["project_status"]) > 300 else context["project_status"])
+        parts.append("")
+    
+    # Agent monitoring note
+    parts.append("## Agent Monitoring Active")
+    parts.append("This session includes comprehensive observability for all agent activities, with TTS notifications and real-time event tracking enabled.")
+    
+    return "\n".join(parts)
+
+
+def create_hook_event(session_id: str, source: str, context: Dict[str, Any], tts_sent: bool = False) -> Dict[str, Any]:
+    """Create hook event for observability server."""
+    return {
+        "source_app": context.get("project_name", "unknown-project"),
+        "session_id": session_id,
+        "hook_event_type": "SessionStart",
+        "timestamp": datetime.now().isoformat(),
+        "payload": {
+            "source": source,
+            "project_context": context,
+            "context_loaded": True,
+            "tts_notification_sent": tts_sent,
+            "intelligent_notification": True  # Flag to indicate smart notification logic
+        }
+    }
+
+
+def main():
+    """Main hook execution function."""
+    try:
+        # Read input data from stdin
+        input_data = json.loads(sys.stdin.read())
+        session_id = input_data.get('session_id', 'unknown')
+        source = input_data.get('source', 'startup')
+        
+        # Ensure session log directory exists
+        ensure_session_log_dir(session_id)
+        
+        # Load project context
+        context = get_project_context()
+        
+        # Generate personalized welcome message
+        welcome_message = format_welcome_message(source, context)
+        
+        # Send TTS notification only when appropriate (agent actually starting work)
+        tts_sent = False
+        if should_send_tts_notification(source, context):
+            notify_tts_coordinated(
+                message=welcome_message,
+                priority="normal",
+                hook_type="session_start",
+                tool_name=f"SessionStart-{source}"
+            )
+            tts_sent = True
+            print(f"TTS notification sent: {welcome_message}", file=sys.stderr)
+        else:
+            print(f"TTS notification skipped for {source} session (no significant work context)", file=sys.stderr)
+        
+        # Create and send observability event
+        event = create_hook_event(session_id, source, context, tts_sent)
+        send_event_to_server(event)
+        
+        # Generate context injection for Claude
+        context_injection = generate_context_injection(context)
+        
+        # Output context injection (special behavior for SessionStart)
+        print(context_injection)
+        
+        # Output structured JSON for advanced processing
+        output = {
+            "hookSpecificOutput": {
+                "hookEventName": "SessionStart",
+                "sessionSource": source,
+                "contextLoaded": True,
+                "projectName": context.get("project_name"),
+                "additionalContext": f"Session initialized with project context. Source: {source}"
+            }
+        }
+        
+        print(f"\n<!-- Hook Output: {json.dumps(output)} -->", file=sys.stderr)
+        
+    except Exception as e:
+        print(f"SessionStart hook error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

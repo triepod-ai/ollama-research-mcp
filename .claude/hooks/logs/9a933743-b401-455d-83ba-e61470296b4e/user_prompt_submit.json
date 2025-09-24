@@ -1,0 +1,16 @@
+[
+  {
+    "session_id": "9a933743-b401-455d-83ba-e61470296b4e",
+    "transcript_path": "/home/bryan/.claude/projects/-home-bryan-multi-agent-observability-system/9a933743-b401-455d-83ba-e61470296b4e.jsonl",
+    "cwd": "/home/bryan/multi-agent-observability-system/.claude/hooks",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "ask @agent-documentation-expert-sonnet to document the updates in the relevent documentation"
+  },
+  {
+    "session_id": "9a933743-b401-455d-83ba-e61470296b4e",
+    "transcript_path": "/home/bryan/.claude/projects/-home-bryan-multi-agent-observability-system/9a933743-b401-455d-83ba-e61470296b4e.jsonl",
+    "cwd": "/home/bryan/multi-agent-observability-system/.claude/hooks",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "/get-up-to-speed-export "
+  }
+]

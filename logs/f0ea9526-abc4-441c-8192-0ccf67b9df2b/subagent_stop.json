@@ -1,0 +1,151 @@
+[
+  {
+    "session_id": "f0ea9526-abc4-441c-8192-0ccf67b9df2b",
+    "transcript_path": "/home/bryan/.claude/projects/-mnt-l-source-repos-mcp-ollama/f0ea9526-abc4-441c-8192-0ccf67b9df2b.jsonl",
+    "cwd": "/mnt/l/source-repos/mcp-ollama",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_metadata": {
+      "agent_id": null,
+      "agent_name": "general-purpose",
+      "agent_type": "generic",
+      "task_description": "",
+      "duration": null,
+      "duration_ms": 0,
+      "result_summary": "",
+      "error_occurred": false,
+      "status": "success",
+      "files_affected": 0,
+      "tests_run": 0,
+      "tools_used": [
+        "Task"
+      ],
+      "tool_calls": {
+        "Task": 1
+      },
+      "token_usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0,
+        "estimated_cost": 0.0
+      },
+      "success_indicators": [],
+      "performance_metrics": {},
+      "code_reviewed": false,
+      "output_metrics": {
+        "files_created": 0,
+        "files_modified": 0,
+        "lines_added": 0,
+        "lines_removed": 0,
+        "tests_passed": 0,
+        "tests_failed": 0
+      },
+      "display_name": "TaskWorker-81D88AF6"
+    },
+    "enhanced_timestamp": "2025-09-24T06:52:32.871933",
+    "hook_version": "enhanced_v3.0"
+  },
+  {
+    "session_id": "f0ea9526-abc4-441c-8192-0ccf67b9df2b",
+    "transcript_path": "/home/bryan/.claude/projects/-mnt-l-source-repos-mcp-ollama/f0ea9526-abc4-441c-8192-0ccf67b9df2b.jsonl",
+    "cwd": "/mnt/l/source-repos/mcp-ollama",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_metadata": {
+      "agent_id": null,
+      "agent_name": "orchestrate-agents-adv",
+      "agent_type": "generic",
+      "task_description": "",
+      "duration": null,
+      "duration_ms": 0,
+      "result_summary": "",
+      "error_occurred": false,
+      "status": "success",
+      "files_affected": 0,
+      "tests_run": 0,
+      "tools_used": [
+        "Write",
+        "Read",
+        "Task"
+      ],
+      "tool_calls": {
+        "Write": 1,
+        "Read": 1,
+        "Task": 1
+      },
+      "token_usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0,
+        "estimated_cost": 0.0
+      },
+      "success_indicators": [],
+      "performance_metrics": {},
+      "code_reviewed": false,
+      "output_metrics": {
+        "files_created": 0,
+        "files_modified": 0,
+        "lines_added": 0,
+        "lines_removed": 0,
+        "tests_passed": 0,
+        "tests_failed": 0
+      },
+      "display_name": "TaskUtility-9DBAB57D"
+    },
+    "enhanced_timestamp": "2025-09-24T06:59:29.785079",
+    "hook_version": "enhanced_v3.0"
+  },
+  {
+    "session_id": "f0ea9526-abc4-441c-8192-0ccf67b9df2b",
+    "transcript_path": "/home/bryan/.claude/projects/-mnt-l-source-repos-mcp-ollama/f0ea9526-abc4-441c-8192-0ccf67b9df2b.jsonl",
+    "cwd": "/mnt/l/source-repos/mcp-ollama",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_metadata": {
+      "agent_id": null,
+      "agent_name": "cmd-agent-select-logic",
+      "agent_type": "generic",
+      "task_description": "",
+      "duration": null,
+      "duration_ms": 0,
+      "result_summary": "",
+      "error_occurred": false,
+      "status": "success",
+      "files_affected": 0,
+      "tests_run": 0,
+      "tools_used": [
+        "TodoWrite",
+        "Stop",
+        "Task"
+      ],
+      "tool_calls": {
+        "TodoWrite": 1,
+        "Stop": 1,
+        "Task": 1
+      },
+      "token_usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0,
+        "estimated_cost": 0.0
+      },
+      "success_indicators": [],
+      "performance_metrics": {},
+      "code_reviewed": false,
+      "output_metrics": {
+        "files_created": 0,
+        "files_modified": 0,
+        "lines_added": 0,
+        "lines_removed": 0,
+        "tests_passed": 0,
+        "tests_failed": 0
+      },
+      "display_name": "TaskHelper-0D821D31"
+    },
+    "enhanced_timestamp": "2025-09-24T07:01:54.266478",
+    "hook_version": "enhanced_v3.0"
+  }
+]

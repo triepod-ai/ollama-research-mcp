@@ -1,0 +1,99 @@
+{
+  "architecture": {
+    "Phase 3.1 - Transcript Processing": [
+      {
+        "file": "transcript_processor.py",
+        "exists": true,
+        "size_kb": 22.9,
+        "has_implementation": true
+      },
+      {
+        "file": "message_aggregation.py",
+        "exists": false,
+        "size_kb": 0,
+        "has_implementation": false
+      }
+    ],
+    "Phase 3.2 - Personalization": [
+      {
+        "file": "personalization_engine.py",
+        "exists": true,
+        "size_kb": 33.1,
+        "has_implementation": true
+      },
+      {
+        "file": "user_profile_system.py",
+        "exists": false,
+        "size_kb": 0,
+        "has_implementation": false
+      }
+    ],
+    "Phase 3.3 - Advanced Coordination": [
+      {
+        "file": "advanced_priority_queue.py",
+        "exists": true,
+        "size_kb": 36.1,
+        "has_implementation": true
+      },
+      {
+        "file": "playback_coordinator.py",
+        "exists": true,
+        "size_kb": 42.9,
+        "has_implementation": true
+      },
+      {
+        "file": "provider_health_monitor.py",
+        "exists": true,
+        "size_kb": 31.5,
+        "has_implementation": true
+      }
+    ],
+    "Phase 3.4 - Streaming TTS": [
+      {
+        "file": "openai_streaming_client.py",
+        "exists": true,
+        "size_kb": 30.0,
+        "has_implementation": true
+      },
+      {
+        "file": "streaming_coordinator.py",
+        "exists": true,
+        "size_kb": 36.3,
+        "has_implementation": true
+      },
+      {
+        "file": "streaming_test_framework.py",
+        "exists": true,
+        "size_kb": 31.7,
+        "has_implementation": true
+      }
+    ],
+    "Phase 3.5 - Unified Integration": [
+      {
+        "file": "phase3_unified_orchestrator.py",
+        "exists": true,
+        "size_kb": 34.2,
+        "has_implementation": true
+      },
+      {
+        "file": "phase3_integration.py",
+        "exists": true,
+        "size_kb": 39.4,
+        "has_implementation": true
+      },
+      {
+        "file": "phase3_comprehensive_test.py",
+        "exists": true,
+        "size_kb": 39.2,
+        "has_implementation": true
+      }
+    ]
+  },
+  "orchestrator": 1.0,
+  "testing": 1.0,
+  "streaming": 1.0,
+  "health": 1.0,
+  "timestamp": "2025-07-21T08:43:09.682964",
+  "success": true,
+  "overall_score": 1.0
+}

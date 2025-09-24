@@ -1,0 +1,9 @@
+[
+  {
+    "session_id": "test-merged-hooks",
+    "transcript_path": "/home/bryan/.claude/projects/test.jsonl",
+    "cwd": "/home/bryan/bin/speak-app",
+    "hook_event_name": "SessionStart",
+    "user_message": "Testing merged hooks"
+  }
+]

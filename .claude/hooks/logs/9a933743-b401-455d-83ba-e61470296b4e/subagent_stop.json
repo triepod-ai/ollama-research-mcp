@@ -1,0 +1,102 @@
+[
+  {
+    "session_id": "9a933743-b401-455d-83ba-e61470296b4e",
+    "transcript_path": "/home/bryan/.claude/projects/-home-bryan-multi-agent-observability-system/9a933743-b401-455d-83ba-e61470296b4e.jsonl",
+    "cwd": "/home/bryan/multi-agent-observability-system/.claude/hooks",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_metadata": {
+      "agent_id": null,
+      "agent_name": "python-backend-engineer",
+      "agent_type": "generic",
+      "task_description": "",
+      "duration": null,
+      "duration_ms": 0,
+      "result_summary": "",
+      "error_occurred": false,
+      "status": "success",
+      "files_affected": 0,
+      "tests_run": 0,
+      "tools_used": [
+        "TodoWrite",
+        "Task",
+        "Bash"
+      ],
+      "tool_calls": {
+        "TodoWrite": 1,
+        "Task": 1,
+        "Bash": 1
+      },
+      "token_usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0,
+        "estimated_cost": 0.0
+      },
+      "success_indicators": [],
+      "performance_metrics": {},
+      "code_reviewed": false,
+      "output_metrics": {
+        "files_created": 0,
+        "files_modified": 0,
+        "lines_added": 0,
+        "lines_removed": 0,
+        "tests_passed": 0,
+        "tests_failed": 0
+      }
+    },
+    "enhanced_timestamp": "2025-08-06T11:04:28.116964",
+    "hook_version": "enhanced_v3.0"
+  },
+  {
+    "session_id": "9a933743-b401-455d-83ba-e61470296b4e",
+    "transcript_path": "/home/bryan/.claude/projects/-home-bryan-multi-agent-observability-system/9a933743-b401-455d-83ba-e61470296b4e.jsonl",
+    "cwd": "/home/bryan/multi-agent-observability-system/.claude/hooks",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_metadata": {
+      "agent_id": null,
+      "agent_name": "documentation-expert-sonnet",
+      "agent_type": "writer",
+      "task_description": "",
+      "duration": null,
+      "duration_ms": 0,
+      "result_summary": "",
+      "error_occurred": false,
+      "status": "success",
+      "files_affected": 0,
+      "tests_run": 0,
+      "tools_used": [
+        "Edit",
+        "Write",
+        "Task",
+        "Stop"
+      ],
+      "tool_calls": {
+        "Edit": 1,
+        "Write": 1,
+        "Task": 1,
+        "Stop": 1
+      },
+      "token_usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0,
+        "estimated_cost": 0.0
+      },
+      "success_indicators": [],
+      "performance_metrics": {},
+      "code_reviewed": false,
+      "output_metrics": {
+        "files_created": 0,
+        "files_modified": 0,
+        "lines_added": 0,
+        "lines_removed": 0,
+        "tests_passed": 0,
+        "tests_failed": 0
+      }
+    },
+    "enhanced_timestamp": "2025-08-06T11:10:21.597555",
+    "hook_version": "enhanced_v3.0"
+  }
+]

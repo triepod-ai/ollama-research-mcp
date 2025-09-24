@@ -1,0 +1,28 @@
+# ⚠️ DEPRECATED: This file is no longer needed with UV Single-File Architecture
+#
+# This project has been converted to UV Single-File Architecture where each hook 
+# declares its own dependencies using embedded script headers. This pyproject.toml
+# is kept for backward compatibility but is no longer used.
+#
+# Each hook now has a header like:
+# #!/usr/bin/env -S uv run --script
+# # /// script
+# # requires-python = ">=3.11"
+# # dependencies = [
+# #     "redis>=4.0.0",
+# #     "requests>=2.28.0", 
+# # ]
+# # ///
+#
+# This eliminates the need for shared dependency management and makes each hook
+# self-contained and easier to deploy.
+
+[project]
+name = "multi-agent-observability-hooks"
+version = "1.0.0-deprecated"
+description = "DEPRECATED: Converted to UV Single-File Architecture"
+requires-python = ">=3.8"
+dependencies = []
+
+[tool.uv]
+# This configuration is deprecated - hooks are now self-contained

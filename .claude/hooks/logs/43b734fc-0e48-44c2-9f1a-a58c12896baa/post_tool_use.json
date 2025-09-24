@@ -1,0 +1,36 @@
+[
+  {
+    "session_id": "43b734fc-0e48-44c2-9f1a-a58c12896baa",
+    "transcript_path": "/home/bryan/.claude/projects/-home-bryan-multi-agent-observability-system/43b734fc-0e48-44c2-9f1a-a58c12896baa.jsonl",
+    "cwd": "/home/bryan/multi-agent-observability-system/.claude/hooks",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "cd /home/bryan/multi-agent-observability-system/.claude/hooks && ./utils/agent_naming_service.py test",
+      "description": "Test the agent naming service"
+    },
+    "tool_response": {
+      "stdout": "Testing Agent Naming Service...\nanalyzer     -> Testinspector-Sage\nreviewer     -> Codesentinel-Xpert\ndebugger     -> Debugfixer-Delta\ntester       -> Testverifier-Pro\ngeneric      -> Taskmaster-Delta\n\nSession names:\nmain         -> Mission-AE32AEDF\nsubagent     -> Task-980EF706\nwave         -> Campaign-64B7B930\nInstalled 21 packages in 81ms",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    }
+  },
+  {
+    "session_id": "43b734fc-0e48-44c2-9f1a-a58c12896baa",
+    "transcript_path": "/home/bryan/.claude/projects/-home-bryan-multi-agent-observability-system/43b734fc-0e48-44c2-9f1a-a58c12896baa.jsonl",
+    "cwd": "/home/bryan/multi-agent-observability-system/.claude/hooks",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "./utils/agent_naming_service.py agent reviewer \"code review for TypeScript files\"",
+      "description": "Test generating a reviewer agent name with context"
+    },
+    "tool_response": {
+      "stdout": "Codesentinel-Xpert",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    }
+  }
+]

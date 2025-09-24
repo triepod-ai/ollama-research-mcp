@@ -1,0 +1,9 @@
+[
+  {
+    "session_id": "01cb0848-64a2-4bc7-8cf4-bab683f0ed5f",
+    "transcript_path": "/home/bryan/.claude/projects/-home-bryan-multi-agent-observability-system/01cb0848-64a2-4bc7-8cf4-bab683f0ed5f.jsonl",
+    "cwd": "/home/bryan/multi-agent-observability-system/.claude/hooks",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "update sessionstart documentation"
+  }
+]

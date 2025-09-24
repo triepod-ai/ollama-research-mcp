@@ -1,0 +1,149 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/pre_tool_use.py"
+          },
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/send_event_async.py --source-app mcp-ollama --event-type PreToolUse --summarize"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/post_tool_use.py"
+          },
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/send_event_async.py --source-app mcp-ollama --event-type PostToolUse --summarize"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/send_event_async.py --source-app mcp-ollama --event-type Notification --summarize"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/stop.py --chat"
+          },
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/send_event_async.py --source-app mcp-ollama --event-type Stop --summarize"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/subagent_stop.py"
+          },
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/send_event_async.py --source-app mcp-ollama --event-type SubagentStop --summarize"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/pre_compact.py"
+          },
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/send_event_async.py --source-app mcp-ollama --event-type PreCompact --summarize"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/user_prompt_submit.py --log-only"
+          },
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/send_event_async.py --source-app mcp-ollama --event-type UserPromptSubmit --summarize"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --with redis /mnt/l/source-repos/mcp-ollama/.claude/hooks/session_context_loader.py"
+          },
+          {
+            "type": "command",
+            "command": "uv run --with openai,pyttsx3 /mnt/l/source-repos/mcp-ollama/.claude/hooks/session_startup_notifier.py"
+          },
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/session_event_tracker.py"
+          }
+        ]
+      },
+      {
+        "matcher": "resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --with redis /mnt/l/source-repos/mcp-ollama/.claude/hooks/session_context_loader.py"
+          },
+          {
+            "type": "command",
+            "command": "uv run --with openai,pyttsx3 /mnt/l/source-repos/mcp-ollama/.claude/hooks/session_resume_detector.py"
+          },
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/session_event_tracker.py"
+          }
+        ]
+      },
+      {
+        "matcher": "clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run /mnt/l/source-repos/mcp-ollama/.claude/hooks/session_event_tracker.py"
+          }
+        ]
+      }
+    ]
+  }
+}
