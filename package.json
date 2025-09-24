@@ -1,6 +1,6 @@
 {
   "name": "mcp-ollama",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "An ollama MCP server integrated with Claude Desktop Commander",
   "private": true,
   "type": "module",
@@ -16,11 +16,11 @@
     "inspector": "npx @modelcontextprotocol/inspector build/index.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "0.6.0",
+    "@modelcontextprotocol/sdk": "^1.18.1",
     "axios": "^1.7.9"
   },
   "devDependencies": {
-    "@types/node": "^20.11.24",
-    "typescript": "^5.3.3"
+    "@types/node": "^24.5.2",
+    "typescript": "^5.9.2"
   }
 }

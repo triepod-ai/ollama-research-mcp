@@ -2,6 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Recent Updates (2025-09-24)
+
+- **MCP SDK Upgrade**: Successfully upgraded from v0.6.0 to v1.18.1
+- **TypeScript Update**: Updated to TypeScript 5.9.2
+- **Compatibility**: Server maintains backward compatibility with existing Claude Desktop configurations
+- **Version Bump**: Server version updated to 0.2.0 to reflect the SDK upgrade
+
 ## Build and Development Commands
 
 ```bash
