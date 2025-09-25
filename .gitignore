@@ -13,7 +13,7 @@ dist/
 .env.local
 .env.*.local
 .claude/*
-
+logs/
 
 # IDE & System files
 .vscode/
