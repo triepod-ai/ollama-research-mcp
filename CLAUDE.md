@@ -2,6 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Recent Updates (2025-09-25)
+
+### Research Tool Improvements (v0.2.1)
+- **Enhanced Theme Extraction**: Improved to capture 2-3 word phrase concepts instead of single words for better thematic analysis
+- **Small Model Divergence**: Revolutionary perspective variation for models <8B parameters using specialized prompting, higher temperature, and unique seeds
+- **Calibrated Confidence Scoring**: Model-aware confidence adjustment based on size (small: 40-45%, medium: 45-50%, large: 50-60%) with realistic 10-95% bounds
+
 ## Recent Updates (2025-09-24)
 
 ### Tool Optimization & Enhancement
@@ -104,6 +111,9 @@ Add to Claude Desktop configuration (`%APPDATA%\Claude\claude_desktop_config.jso
 ### Temperature Guidelines
 - **0.1-0.3**: Code generation and technical tasks
 - **0.7-1.0**: Creative and conversational tasks
+
+### Research Tool
+- For meaningful divergent perspectives, use larger models (>20B parameters) - smaller models often produce empty divergent analysis
 
 ## Module System Configuration
 

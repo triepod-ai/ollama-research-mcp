@@ -1,0 +1,198 @@
+{
+  "testSuite": {
+    "name": "MCP Ollama Research Tool Test Suite",
+    "version": "1.0.0",
+    "description": "Comprehensive testing infrastructure for MCP Ollama research tool",
+    "coverage": {
+      "targets": {
+        "global": {
+          "branches": 90,
+          "functions": 90,
+          "lines": 90,
+          "statements": 90
+        },
+        "core": {
+          "research-tool": 95,
+          "model-selector": 90,
+          "response-analyzer": 90,
+          "performance-config": 85
+        }
+      },
+      "reporters": ["text", "lcov", "html", "json"],
+      "directory": "coverage"
+    }
+  },
+  "testCategories": {
+    "unit": {
+      "directory": "tests/unit",
+      "timeout": 30000,
+      "files": [
+        "model-selector.test.ts",
+        "response-analyzer.test.ts",
+        "research-tool.test.ts"
+      ],
+      "description": "Individual component testing in isolation"
+    },
+    "integration": {
+      "directory": "tests/integration",
+      "timeout": 60000,
+      "files": [
+        "mcp-server.test.ts"
+      ],
+      "description": "Component interaction and MCP protocol testing"
+    },
+    "performance": {
+      "directory": "tests/performance",
+      "timeout": 120000,
+      "files": [
+        "research-performance.test.ts"
+      ],
+      "description": "Performance validation and resource usage testing"
+    },
+    "e2e": {
+      "directory": "tests/e2e",
+      "timeout": 180000,
+      "files": [
+        "ollama-integration.test.ts"
+      ],
+      "description": "End-to-end testing with real Ollama API",
+      "requirements": {
+        "ollama": "Running Ollama instance",
+        "models": "At least one model (e.g., llama3.2:1b)",
+        "network": "Network connectivity to Ollama API"
+      }
+    }
+  },
+  "performanceBenchmarks": {
+    "simple": {
+      "maxExecutionTime": 5000,
+      "maxMemoryUsage": 20971520,
+      "description": "Simple complexity queries"
+    },
+    "medium": {
+      "maxExecutionTime": 8000,
+      "maxMemoryUsage": 31457280,
+      "description": "Medium complexity queries"
+    },
+    "complex": {
+      "maxExecutionTime": 12000,
+      "maxMemoryUsage": 52428800,
+      "description": "Complex complexity queries"
+    },
+    "concurrent": {
+      "maxConcurrentRequests": 10,
+      "maxTotalTime": 15000,
+      "maxMemoryUsage": 209715200,
+      "description": "Concurrent execution testing"
+    }
+  },
+  "mockConfiguration": {
+    "axios": {
+      "behaviors": ["success", "error", "timeout", "mixed"],
+      "responseDelays": {
+        "fast": 100,
+        "medium": 1000,
+        "slow": 3000
+      },
+      "models": [
+        {
+          "name": "llama3.2:1b",
+          "size": 1234567890,
+          "tier": "fast",
+          "complexity": ["simple", "medium"]
+        },
+        {
+          "name": "qwen2.5-coder:7b-instruct",
+          "size": 4567890123,
+          "tier": "balanced",
+          "complexity": ["medium", "complex"]
+        },
+        {
+          "name": "smallthinker:latest",
+          "size": 2345678901,
+          "tier": "balanced",
+          "complexity": ["medium", "complex"]
+        }
+      ]
+    }
+  },
+  "testEnvironments": {
+    "development": {
+      "OLLAMA_HOST": "http://127.0.0.1:11434",
+      "NODE_ENV": "test",
+      "LOG_LEVEL": "debug"
+    },
+    "ci": {
+      "OLLAMA_HOST": "http://localhost:11434",
+      "NODE_ENV": "test",
+      "LOG_LEVEL": "error",
+      "CI": "true"
+    },
+    "docker": {
+      "OLLAMA_HOST": "http://host.docker.internal:11434",
+      "NODE_ENV": "test",
+      "LOG_LEVEL": "warn"
+    }
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest --testPathPattern=unit",
+    "test:integration": "jest --testPathPattern=integration",
+    "test:performance": "jest --testPathPattern=performance --testTimeout=60000",
+    "test:e2e": "jest --testPathPattern=e2e --testTimeout=120000",
+    "test:ci": "jest --coverage --ci --watchAll=false",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:performance"
+  },
+  "cicd": {
+    "github": {
+      "workflow": ".github/workflows/test.yml",
+      "jobs": [
+        "test",
+        "e2e-tests",
+        "security",
+        "performance-benchmark",
+        "code-quality",
+        "cross-platform",
+        "release-check"
+      ],
+      "nodeVersions": ["18.x", "20.x"],
+      "platforms": ["ubuntu-latest", "windows-latest", "macos-latest"]
+    },
+    "coverage": {
+      "service": "codecov",
+      "uploadArtifacts": true,
+      "retentionDays": 30
+    }
+  },
+  "tooling": {
+    "jest": {
+      "version": "^29.7.0",
+      "preset": "ts-jest/presets/default-esm",
+      "testEnvironment": "node"
+    },
+    "typescript": {
+      "version": "^5.9.2",
+      "target": "ES2022",
+      "module": "ESNext"
+    },
+    "coverage": {
+      "reporters": ["text", "lcov", "html", "json"],
+      "thresholds": "enforced"
+    }
+  },
+  "documentation": {
+    "readme": "tests/README.md",
+    "setup": "tests/setup.ts",
+    "mocks": "tests/mocks/",
+    "examples": "See individual test files for usage examples"
+  },
+  "maintenance": {
+    "reviewSchedule": "Monthly",
+    "performanceBaseline": "Track execution time trends",
+    "dependencyUpdates": "Automated via GitHub Actions",
+    "testDataRefresh": "Quarterly review of mock data"
+  }
+}

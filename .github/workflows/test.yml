@@ -1,0 +1,312 @@
+# GitHub Actions Workflow for MCP Ollama Testing
+# Comprehensive CI/CD pipeline with multiple test categories and coverage reporting
+
+name: Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Unit and Integration Tests
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run TypeScript type checking
+      run: npm run lint
+
+    - name: Run unit tests
+      run: npm run test:unit
+
+    - name: Run integration tests
+      run: npm run test:integration
+
+    - name: Run performance tests
+      run: npm run test:performance
+
+    - name: Generate coverage report
+      run: npm run test:coverage
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.node-version }}
+        path: |
+          coverage/
+          coverage/html-report/
+        retention-days: 30
+
+  # End-to-End Tests with Real Ollama
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Ollama
+      run: |
+        curl -fsSL https://ollama.com/install.sh | sh
+
+    - name: Start Ollama service
+      run: |
+        # Start Ollama in background
+        ollama serve &
+
+        # Wait for Ollama to start
+        timeout=30
+        while ! curl -f http://localhost:11434/api/tags >/dev/null 2>&1; do
+          if [ $timeout -eq 0 ]; then
+            echo "Timed out waiting for Ollama to start"
+            exit 1
+          fi
+          echo "Waiting for Ollama to start... ($timeout seconds remaining)"
+          sleep 1
+          timeout=$((timeout - 1))
+        done
+
+        echo "Ollama is running"
+
+    - name: Pull test models
+      run: |
+        # Pull lightweight model for testing
+        ollama pull llama3.2:1b
+
+        # Verify model is available
+        ollama list
+
+    - name: Run E2E tests
+      run: npm run test:e2e
+      env:
+        OLLAMA_HOST: http://localhost:11434
+
+    - name: Upload E2E test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: e2e-test-results
+        path: |
+          coverage/
+        retention-days: 30
+
+  # Security and Quality Checks
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run security audit
+      run: npm audit --audit-level=moderate
+
+    - name: Check for outdated dependencies
+      run: npm outdated
+      continue-on-error: true
+
+  # Performance Benchmarking
+  performance-benchmark:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run performance benchmarks
+      run: |
+        # Run performance tests with detailed output
+        npm run test:performance -- --verbose
+
+    - name: Store benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
+      if: github.ref == 'refs/heads/main'
+      with:
+        tool: 'customSmallerIsBetter'
+        output-file-path: performance-results.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: true
+        comment-on-alert: true
+        alert-threshold: '150%'
+        fail-on-alert: false
+
+  # Code Quality Analysis
+  code-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build project
+      run: npm run build
+
+    - name: Run TypeScript strict checks
+      run: npx tsc --strict --noEmit
+      continue-on-error: true
+
+    - name: Check bundle size
+      run: |
+        # Analyze build output size
+        du -sh build/
+        ls -la build/
+
+  # Cross-platform Testing
+  cross-platform:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run core tests
+      run: |
+        npm run test:unit
+        npm run test:integration
+
+  # Release Readiness Check
+  release-check:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [test, e2e-tests, security, code-quality]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build for production
+      run: npm run build
+
+    - name: Run comprehensive test suite
+      run: npm run test:ci
+
+    - name: Verify package integrity
+      run: |
+        npm pack --dry-run
+        npm run lint
+
+    - name: Generate release artifacts
+      run: |
+        # Create release build
+        npm run clean
+        npm run build
+
+        # Package for distribution
+        tar -czf mcp-ollama-build.tar.gz build/
+
+    - name: Upload release artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-build
+        path: |
+          build/
+          mcp-ollama-build.tar.gz
+        retention-days: 90
+
+# Workflow Status Reporting
+  status-check:
+    runs-on: ubuntu-latest
+    needs: [test, e2e-tests, security, code-quality, cross-platform]
+    if: always()
+
+    steps:
+    - name: Check workflow status
+      run: |
+        echo "Test Results Summary:"
+        echo "- Unit/Integration Tests: ${{ needs.test.result }}"
+        echo "- E2E Tests: ${{ needs.e2e-tests.result }}"
+        echo "- Security Check: ${{ needs.security.result }}"
+        echo "- Code Quality: ${{ needs.code-quality.result }}"
+        echo "- Cross-platform: ${{ needs.cross-platform.result }}"
+
+        # Fail if any critical jobs failed
+        if [[ "${{ needs.test.result }}" == "failure" || "${{ needs.e2e-tests.result }}" == "failure" ]]; then
+          echo "Critical tests failed!"
+          exit 1
+        fi
