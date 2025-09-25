@@ -12,6 +12,8 @@ dist/
 .env
 .env.local
 .env.*.local
+.claude/*
+
 
 # IDE & System files
 .vscode/
@@ -24,6 +26,7 @@ Thumbs.db
 desktop.ini
 
 # Logs
+research/
 logs/
 *.log
 npm-debug.log*
@@ -48,3 +51,11 @@ tmp/
 
 # Package manager files (keep package-lock.json)
 # pnpm-lock.yaml is excluded above
+opus-vs-qwen-comparison.md
+PROJECT_STATUS.md
+.claude/agents/general-research-assistant.md
+logs/hooks/post_tool_use_success/post_tool_use_success_20250924.jsonl
+logs/hooks/pre_tool_use/pre_tool_use_20250924.jsonl
+research_progress.md
+logs/hooks/post_tool_use_success/post_tool_use_success_20250924.jsonl
+logs/hooks/pre_tool_use/pre_tool_use_20250924.jsonl
