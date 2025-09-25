@@ -5,6 +5,7 @@ import { CallToolRequestSchema, ErrorCode, ListToolsRequestSchema, McpError, } f
 import axios from 'axios';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { ResearchTool } from './research-tool.js';
 const execAsync = promisify(exec);
 // Default Ollama API endpoint
 const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://127.0.0.1:11434';
@@ -18,6 +19,7 @@ const formatError = (error) => {
 };
 class OllamaServer {
     server;
+    researchTool;
     constructor() {
         this.server = new Server({
             name: 'ollama',
@@ -27,6 +29,8 @@ class OllamaServer {
                 tools: {},
             },
         });
+        // Initialize research tool
+        this.researchTool = new ResearchTool(OLLAMA_HOST);
         this.setupToolHandlers();
         // Error handling
         this.server.onerror = (error) => console.error('[MCP Error]', error);
@@ -83,7 +87,7 @@ class OllamaServer {
                 },
                 {
                     name: 'run',
-                    description: 'Execute a single prompt and get plain text response. Ideal for one-off queries, code generation, and analysis tasks. Returns clean output without JSON wrapping or template artifacts. Faster than chat_completion for single requests.',
+                    description: 'Execute a single prompt and get plain text response. Ideal for one-off queries, code generation, and analysis tasks. For coding tasks, use larger models (20B+ params) for better quality. Returns clean output without JSON wrapping or template artifacts. Faster than chat_completion for single requests.',
                     inputSchema: {
                         type: 'object',
                         properties: {
@@ -135,7 +139,7 @@ class OllamaServer {
                 },
                 {
                     name: 'pull',
-                    description: 'Download models from Ollama registry. Model sizes vary from <1GB to 100GB+. Smaller models (1-7B params) are faster, larger models (30B+ params) offer better quality. Check available disk space before downloading.',
+                    description: 'Download models from Ollama registry. Model sizes vary from <1GB to 100GB+. Smaller models (1-7B params) are faster, larger models (30B+ params) offer better quality and are recommended for coding tasks. Check available disk space before downloading.',
                     inputSchema: {
                         type: 'object',
                         properties: {
@@ -263,6 +267,58 @@ class OllamaServer {
                         additionalProperties: false,
                     },
                 },
+                {
+                    name: 'research',
+                    description: 'Intelligent multi-model research tool that queries 3 different models and provides comparative analysis. Automatically selects optimal models based on complexity (simple/medium/complex) and focus (technical/business/ethical/creative/general). Returns convergent themes, divergent perspectives, and synthesized recommendations. Note: For meaningful divergent perspectives, use larger models (>20B parameters).',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            question: {
+                                type: 'string',
+                                description: 'Research question or topic to investigate across multiple models',
+                            },
+                            complexity: {
+                                type: 'string',
+                                enum: ['simple', 'medium', 'complex'],
+                                description: 'Complexity level: simple (fast models, brief responses), medium (balanced), complex (detailed analysis). Default: medium',
+                            },
+                            models: {
+                                type: 'array',
+                                items: {
+                                    type: 'string',
+                                },
+                                description: 'Optional: specify exact 3 models to use (e.g., ["llama3.2:1b", "qwen2.5:7b"]). If omitted, optimal models are selected automatically.',
+                            },
+                            focus: {
+                                type: 'string',
+                                enum: ['technical', 'business', 'ethical', 'creative', 'general'],
+                                description: 'Research focus area for model selection optimization. Default: general',
+                            },
+                            parallel: {
+                                type: 'boolean',
+                                description: 'Execute queries in parallel (faster) or sequential (resource-friendly). Default: false',
+                            },
+                            include_metadata: {
+                                type: 'boolean',
+                                description: 'Include model specifications in response for analysis. Default: false',
+                            },
+                            timeout: {
+                                type: 'number',
+                                description: 'Custom timeout in milliseconds. Auto-calculated based on complexity if not specified.',
+                                minimum: 10000,
+                                maximum: 600000,
+                            },
+                            temperature: {
+                                type: 'number',
+                                description: 'Controls response randomness across all models: 0.1-0.3 for factual, 0.7-1.0 for creative. Default: 0.7',
+                                minimum: 0,
+                                maximum: 2,
+                            },
+                        },
+                        required: ['question'],
+                        additionalProperties: false,
+                    },
+                },
             ],
         }));
         this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
@@ -288,6 +344,8 @@ class OllamaServer {
                         return await this.handleRemove(request.params.arguments);
                     case 'chat_completion':
                         return await this.handleChatCompletion(request.params.arguments);
+                    case 'research':
+                        return await this.handleResearch(request.params.arguments);
                     default:
                         throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${request.params.name}`);
                 }
@@ -547,6 +605,47 @@ class OllamaServer {
                 throw new McpError(ErrorCode.InternalError, `Ollama API error: ${error.response?.data?.error || error.message}`);
             }
             throw new McpError(ErrorCode.InternalError, `Unexpected error: ${formatError(error)}`);
+        }
+    }
+    async handleResearch(args) {
+        try {
+            // Validate required parameters
+            if (!args.question || typeof args.question !== 'string') {
+                throw new McpError(ErrorCode.InvalidParams, 'Research question is required');
+            }
+            // Build research request with validation
+            const request = {
+                question: args.question,
+                complexity: args.complexity || 'medium',
+                models: args.models,
+                focus: args.focus || 'general',
+                parallel: args.parallel || false,
+                include_metadata: args.include_metadata || false,
+                timeout: args.timeout,
+                temperature: args.temperature || 0.7
+            };
+            // Validate enum values
+            if (!['simple', 'medium', 'complex'].includes(request.complexity)) {
+                throw new McpError(ErrorCode.InvalidParams, 'Complexity must be one of: simple, medium, complex');
+            }
+            if (!['technical', 'business', 'ethical', 'creative', 'general'].includes(request.focus)) {
+                throw new McpError(ErrorCode.InvalidParams, 'Focus must be one of: technical, business, ethical, creative, general');
+            }
+            // Execute research
+            const result = await this.researchTool.executeResearch(request);
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify(result, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            if (error instanceof McpError)
+                throw error;
+            throw new McpError(ErrorCode.InternalError, `Research execution failed: ${formatError(error)}`);
         }
     }
     async run() {
